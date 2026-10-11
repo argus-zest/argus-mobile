@@ -23,3 +23,31 @@ body {
 .safe-top {
   padding-top: env(safe-area-inset-top, 12px);
 }
+
+/* Bottom-sheet animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(24px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.18s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.22s ease-out;
+}
+
+/* Respect users who prefer reduced motion: sheets appear instantly,
+ * decorative rain/pulse loops are rendered statically (see MapScreen). */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up {
+    animation: none;
+  }
+}

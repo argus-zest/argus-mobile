@@ -71,12 +71,13 @@ Calculate precipitation-adjusted flood probabilities and submerged hazard scores
 ---
 
 ## 3. Hazard Report & Photo Upload
-### Step 1: `POST /v1/report/presign`
+### Step 1: `POST /v1/uploads/presign`
 Request an Amazon S3 presigned URL for direct image upload.
 
 **Request Body**:
 ```json
 {
+  "purpose": "report",
   "content_type": "image/jpeg"
 }
 ```
@@ -85,42 +86,58 @@ Request an Amazon S3 presigned URL for direct image upload.
 ```json
 {
   "upload_url": "https://argus-uploads.s3.amazonaws.com/...",
-  "file_key": "reports/raw/2026-10-11/upload_xyz.jpg"
+  "s3_key": "uploads/uuid4.jpg",
+  "expires_in": 300
 }
 ```
 
 ### Step 2: Upload File
-Perform HTTP `PUT` directly to `upload_url` with the image binary payload.
+Perform HTTP `PUT` directly to `upload_url` with the image binary payload and the same `Content-Type`.
 
-### Step 3: `POST /v1/report/analyze`
+### Step 3: `POST /v1/analyze`
 Trigger Amazon Bedrock Nova 2 Lite AI vision analysis on the uploaded photo.
 
 **Request Body**:
 ```json
 {
-  "file_key": "reports/raw/2026-10-11/upload_xyz.jpg",
-  "lat": 28.6330,
-  "lng": 77.2200,
-  "user_hazard_type": "open_manhole"
+  "s3_key": "uploads/uuid4.jpg"
 }
 ```
 
 **Response `200 OK`**:
 ```json
 {
-  "case_id": "CASE-2026-DEL-104",
-  "status": "OPEN",
-  "hazard_detected": true,
-  "severity": "high",
-  "escalation_rung": 2
+  "analysis": {
+    "hazard_type": "open_manhole",
+    "severity": 4,
+    "submerged": true,
+    "confidence": 0.82,
+    "description": "...",
+    "visible_evidence": "..."
+  }
 }
 ```
+
+### Step 4: `POST /v1/resolve` then `POST /v1/cases`
+Resolve ownership/warranty with `{"lat", "lng", "asset_type"}`, then open a case with
+`{"hotspot_id?", "lat", "lng", "asset_type?", "analysis?", "photo_key?", "timer_profile": "demo|real"}`.
+The response is `201` with the created `Case` (`case_id` like `CS-ABC123`).
 
 ---
 
 ## 4. Cases
 ### `GET /v1/cases`
-Fetch all active and resolved civic escalation cases.
+Fetch recent civic escalation cases (newest first, max 50).
 
 ### `GET /v1/cases/{case_id}`
-Fetch detailed timeline and Step Functions audit log for a specific case.
+Fetch case details, event timeline, and an optional presigned `photo_url`.
+
+### `POST /v1/cases/{case_id}/claim-fix`
+Submit a repair verification claim with `{"s3_key", "lat", "lng"}`.
+Response: `{"accepted", "reason": "VERIFIED|TOO_FAR|HAZARD_STILL_PRESENT|LOCATION_MISMATCH|LOW_CONFIDENCE|CASE_NOT_OPEN", "distance_m", "verification"}`.
+Claims more than 25 m from the hazard are rejected with `TOO_FAR`.
+
+## 5. Model & Evidence
+### `GET /v1/eval/results`
+Fetch `{"rdd2022": {...}|null, "backtest": {...}|null}`. Null sections render as
+"Not yet measured" / "No backtest events loaded" and are never treated as errors.
