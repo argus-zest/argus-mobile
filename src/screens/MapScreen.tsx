@@ -341,8 +341,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       if (count > 0) {
-        ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = 'rgba(29, 78, 216, 0.70)';
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
         for (const d of drops) {
           ctx.moveTo(d.x, d.y);
@@ -362,8 +362,8 @@ export const MapScreen: React.FC<MapScreenProps> = ({
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       ctx.clearRect(0, 0, width, height);
       if (count > 0) {
-        ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = 'rgba(29, 78, 216, 0.70)';
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
         for (const d of drops) {
           ctx.moveTo(d.x, d.y);
