@@ -36,9 +36,10 @@ Thank you for contributing to **Argus Mobile**! We want to make collaborating as
 ## 📝 Pull Request Checklist
 
 Before submitting a Pull Request:
-1. Ensure your code passes TypeScript checks:
+1. Ensure your code passes TypeScript checks and unit tests:
    ```bash
    npm run build
+   npm test
    ```
 2. Test on both desktop mobile emulation and a real phone device if possible.
 3. Keep pull requests focused on a single feature or screen.

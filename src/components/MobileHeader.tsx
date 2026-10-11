@@ -1,14 +1,21 @@
 import React from 'react';
-import { Radio, ShieldCheck } from 'lucide-react';
+import { Activity, Radio, ShieldCheck } from 'lucide-react';
+import { MockBadge } from './chips';
 
 interface MobileHeaderProps {
   title?: string;
   subtitle?: string;
+  mock?: boolean;
+  onOpenEvidence?: () => void;
+  onOpenArchitecture?: () => void;
 }
 
 export const MobileHeader: React.FC<MobileHeaderProps> = ({
-  title = "Argus Mobile",
-  subtitle = "Urban Flood & Hazard Intelligence",
+  title = 'Argus Mobile',
+  subtitle = 'Urban Flood & Hazard Intelligence',
+  mock = false,
+  onOpenEvidence,
+  onOpenArchitecture,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 py-2.5 safe-top shadow-xs">
@@ -40,6 +47,30 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           </div>
         </div>
       </div>
+
+      {(mock || onOpenEvidence || onOpenArchitecture) && (
+        <div className="flex items-center gap-1.5 mt-2">
+          {mock && <MockBadge />}
+          <div className="flex-1" />
+          {onOpenEvidence && (
+            <button
+              onClick={onOpenEvidence}
+              className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-semibold bg-white text-slate-700 border border-slate-200"
+            >
+              <Activity className="w-3 h-3 mr-1 text-slate-500" />
+              <span>Model &amp; evidence</span>
+            </button>
+          )}
+          {onOpenArchitecture && (
+            <button
+              onClick={onOpenArchitecture}
+              className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-semibold bg-white text-slate-700 border border-slate-200"
+            >
+              <span>Architecture</span>
+            </button>
+          )}
+        </div>
+      )}
     </header>
   );
 };
